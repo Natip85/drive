@@ -1,4 +1,6 @@
-import { postRouter } from "~/server/api/routers/post";
+import { usersRouter } from "~/features/auth/users-router";
+import { filesRouter } from "~/features/drive/files-router";
+import { foldersRouter } from "~/features/drive/folders-router";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -7,7 +9,9 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
+  users: usersRouter,
+  files: filesRouter,
+  folders: foldersRouter,
 });
 
 // export type definition of API

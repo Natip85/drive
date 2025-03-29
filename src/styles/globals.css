@@ -1,6 +1,115 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --foreground: 0 0% 3.9%; /* #222222 */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 0 0% 3.9%; /* #222222 */
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 0 0% 3.9%; /* #222222 */
+    /* Primary (Yellow) */
+    --primary: 54 96% 51.8%; /* #F2ED21 */
+    --primary-foreground: 0 0% 3.9%; /* #222222 */
+    /* Secondary */
+    --secondary: 0 0% 93.3%; /* #EEEEEE */
+    --secondary-foreground: 0 0% 13.3%; /* #222222 */
+    /* Muted */
+    --muted: 0 0% 93.3%; /* #EEEEEE */
+    --muted-foreground: 0 0% 33.1%; /* #545454 */
+    /* Success */
+    --success: 142 40.7% 40.2%; /* #518661 */
+    --success-foreground: 0 0% 100%; /* #FFFFFF */
+    /* Destructive (Error) */
+    --destructive: 0 79.2% 43.6%; /* #D6321A */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+    /* Border */
+    --border: 0 0% 89.8%; /* #E2E2E2 */
+    --input: 0 0% 89.8%; /* #E2E2E2 */
+    /* Ring */
+    --ring: 0 0% 3.9%; /* #222222 */
+    /* Chart Colors */
+    --chart-1: 12 76% 61%; /* #F46A6A */
+    --chart-2: 173 58% 39%; /* #67C7A7 */
+    --chart-3: 197 37% 24%; /* #6B89C4 */
+    --chart-4: 43 74% 66%; /* #B6E05C */
+    --chart-5: 27 87% 67%; /* #FFD700 */
+    --chart-6: 270 87% 67%; /* #9B4DFF */
+    /* TODO update */
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
 
-@theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --radius: 0.5rem;
+
+    --sidebar-background: 210 60% 97%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    /* Backgrounds */
+    --background: 0 0% 3.9%; /* #000000 */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+    --card: 0 0% 3.9%; /* #181818 */
+    --card-foreground: 0 0% 100%; /* #FFFFFF */
+    --popover: 0 0% 3.9%; /* #181818 */
+    --popover-foreground: 0 0% 100%; /* #FFFFFF */
+    /* Primary (Yellow) */
+    --primary: 54 96% 51.8%; /* #F2ED21 */
+    --primary-foreground: 0 0% 3.9%; /* #000000 */
+    /* Secondary */
+    --secondary: 0 0% 21.1%; /* #353320 */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+    /* Muted */
+    --muted: 0 0% 21.1%; /* #353320 */
+    --muted-foreground: 0 0% 63.9%; /* #CBCBCB */
+    /* Success */
+    --success: 142 40.7% 40.2%; /* #518661 */
+    --success-foreground: 0 0% 100%; /* #FFFFFF */
+    /* Destructive (Error) */
+    --destructive: 0 62.8% 30.6%; /* #D6321A */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+    /* Border */
+    --border: 0 0% 14.9%; /* #353320 */
+    --input: 0 0% 14.9%; /* #353320 */
+    /* Ring */
+    --ring: 0 0% 83.1%; /* #CBCBCB */
+    /* Chart Colors */
+    --chart-1: 12 76% 61%; /* #F46A6A */
+    --chart-2: 173 58% 39%; /* #67C7A7 */
+    --chart-3: 197 37% 24%; /* #6B89C4 */
+    --chart-4: 43 74% 66%; /* #B6E05C */
+    --chart-5: 27 87% 67%; /* #FFD700 */
+    /* TODO update */
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
