@@ -1,8 +1,6 @@
 "use client";
 import {
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Filter,
   Info,
   MoreHorizontal,
@@ -10,13 +8,11 @@ import {
   Search,
   Settings,
   Upload,
-  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -22,7 +22,7 @@ export default async function DriveLayout({
   if (!session) {
     return redirect("/auth/login");
   }
-  const { rootFolderId, trashFolderId } = await api.folders.getSidebarFolders(
+  const { rootFolderId } = await api.folders.getSidebarFolders(
     session?.user.id,
   );
   return (
@@ -34,10 +34,7 @@ export default async function DriveLayout({
       }
     >
       <SidebarProvider defaultOpen={defaultOpen}>
-        <DriveSidebar
-          rootFolderId={rootFolderId}
-          trashFolderId={trashFolderId}
-        />
+        <DriveSidebar rootFolderId={rootFolderId} />
         <SidebarTrigger />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>

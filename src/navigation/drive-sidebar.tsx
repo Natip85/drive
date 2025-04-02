@@ -29,10 +29,9 @@ import { usePathname } from "next/navigation";
 import AddRenameFolderForm from "~/features/drive/add-rename-folder-form";
 type Props = {
   rootFolderId: string | null;
-  trashFolderId: string | null;
 };
 
-export function DriveSidebar({ rootFolderId, trashFolderId }: Props) {
+export function DriveSidebar({ rootFolderId }: Props) {
   const [addFolderOpen, setAddFolderOpen] = useState(false);
   const pathname = usePathname();
   const folderId = pathname.split("/").pop();

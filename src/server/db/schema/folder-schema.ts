@@ -1,4 +1,4 @@
-import { index, integer, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { index, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { createTable } from "../utils";
 
 export const folders_table = createTable(

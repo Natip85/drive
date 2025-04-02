@@ -31,8 +31,7 @@ import { TableCell, TableRow } from "~/components/ui/table";
 export function FileRow(props: { file: typeof files_table.$inferSelect }) {
   const router = useRouter();
   const { file } = props;
-  const { mutateAsync: moveToTrash, isPending: isLoading } =
-    api.files.moveFileToTrash.useMutation();
+  const { mutateAsync: moveToTrash } = api.files.moveFileToTrash.useMutation();
 
   return (
     <TableRow key={file.id} className="hover:bg-gray-750">
@@ -81,8 +80,7 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
 export function FileCard(props: { file: typeof files_table.$inferSelect }) {
   const router = useRouter();
   const { file } = props;
-  const { mutateAsync: moveToTrash, isPending: isLoading } =
-    api.files.moveFileToTrash.useMutation();
+  const { mutateAsync: moveToTrash } = api.files.moveFileToTrash.useMutation();
 
   return (
     <Card key={file.id} className="overflow-hidden p-3">
@@ -137,8 +135,7 @@ export function TrashedFileRow(props: {
 
   const { mutateAsync: deleteFile, isPending: isDeleteLoading } =
     api.files.deleteFile.useMutation();
-  const { mutateAsync: restoreFile, isPending: isRestoreLoading } =
-    api.files.restoreFile.useMutation();
+  const { mutateAsync: restoreFile } = api.files.restoreFile.useMutation();
   return (
     <TableRow key={file.id} className="hover:bg-gray-750">
       <TableCell className="w-6/12">
@@ -217,7 +214,7 @@ export function FolderRow(props: {
   const router = useRouter();
   const { folder } = props;
   const [renameFolderOpen, setRenameFolderOpen] = useState(false);
-  const { mutateAsync: moveToTrash, isPending: isLoading } =
+  const { mutateAsync: moveToTrash } =
     api.folders.moveFolderToTrash.useMutation();
   return (
     <Fragment key={folder.id}>
@@ -345,7 +342,7 @@ export function TrashedFolderRow(props: {
   const router = useRouter();
   const { folder } = props;
   const [renameFolderOpen, setRenameFolderOpen] = useState(false);
-  const { mutateAsync: restoreFolder, isPending: isLoading } =
+  const { mutateAsync: restoreFolder } =
     api.folders.restoreFolder.useMutation();
   return (
     <li

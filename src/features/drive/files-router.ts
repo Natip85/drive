@@ -5,7 +5,7 @@ import {
 } from "~/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { files_table, folders_table } from "~/server/db/schema";
+import { files_table } from "~/server/db/schema";
 import { eq, and, isNull, isNotNull } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
@@ -27,7 +27,7 @@ export const filesRouter = createTRPCRouter({
         )
         .orderBy(files_table.id);
     }),
-  getTrashFiles: protectedProcedure.query(async ({ ctx, input }) => {
+  getTrashFiles: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }

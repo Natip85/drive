@@ -54,8 +54,7 @@ export const foldersRouter = createTRPCRouter({
       );
 
       return {
-        rootFolderId: folderMap["Root"] ?? null,
-        trashFolderId: folderMap["Trash"] ?? null,
+        rootFolderId: folderMap.Root ?? null,
       };
     }),
   getAllParentsForFolder: protectedProcedure
@@ -200,6 +199,7 @@ export const foldersRouter = createTRPCRouter({
     }),
 });
 
+// @ts-ignore
 async function getAllDescendantFolders(
   folderPublicId: string,
   tx: any,
