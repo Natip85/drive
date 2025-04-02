@@ -199,7 +199,7 @@ export const foldersRouter = createTRPCRouter({
     }),
 });
 
-// @ts-ignore
+// "@ts-expect-error"
 async function getAllDescendantFolders(
   folderPublicId: string,
   tx: any,
