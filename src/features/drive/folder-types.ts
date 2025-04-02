@@ -7,6 +7,8 @@ export const folderSelectSchema = createSelectSchema(folders_table);
 
 export const folderAddRenameSchema = createSelectSchema(folders_table).omit({
   id: true,
+  publicId: true,
+  deletedAt: true,
 });
 
 export type FolderAddRename = z.infer<typeof folderAddRenameSchema>;

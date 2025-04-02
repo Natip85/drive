@@ -31,7 +31,7 @@ export default function AddRenameFolderForm({
   const router = useRouter();
   const { user } = useUser();
   const pathname = usePathname();
-  const folderId = Number(pathname.split("/").pop());
+  const folderId = pathname.split("/").pop();
 
   const { mutateAsync: add, isPending: isLoading } =
     api.folders.createNewFolder.useMutation();
@@ -45,12 +45,17 @@ export default function AddRenameFolderForm({
       createdAt: new Date(),
       name: "Untitled folder",
       ownerId: user.id,
-      parent: isNaN(folderId) ? 1 : folderId,
+      parent: folderId,
     },
   });
   const onSubmit = async (values: FolderAddRename) => {
     if (folder) {
-      await rename({ ...values, id: folder.id });
+      await rename({
+        ...values,
+        publicId: folder.publicId,
+        id: folder.id,
+        deletedAt: folder.deletedAt,
+      });
       setIsOpen(false);
       router.refresh();
     } else {
@@ -85,11 +90,16 @@ export default function AddRenameFolderForm({
               variant={"ghost"}
               type="button"
               onClick={() => setIsOpen(false)}
+              className="rounded-full hover:bg-[#C1E7FE]"
             >
               Cancel
             </Button>
 
-            <Button variant={"ghost"} type="submit">
+            <Button
+              variant={"ghost"}
+              type="submit"
+              className="rounded-full hover:bg-[#C1E7FE]"
+            >
               {isLoading || isRenameLoading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="animate-spin" />

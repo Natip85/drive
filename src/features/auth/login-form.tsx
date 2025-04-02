@@ -50,7 +50,7 @@ export function LoginForm({
   return (
     <Card className="border-none">
       <CardHeader>
-        <CardTitle>Login to your JHDB account</CardTitle>
+        <CardTitle>Login to your family account</CardTitle>
         <CardDescription>
           We&apos;ll keep you updated on any submissions that you make
         </CardDescription>

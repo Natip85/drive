@@ -43,20 +43,26 @@ CREATE TABLE "auth_verification_token" (
 --> statement-breakpoint
 CREATE TABLE "drive_files_table" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"public_id" text NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"owner_id" text NOT NULL,
 	"size" integer NOT NULL,
 	"url" text NOT NULL,
-	"parent" integer NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"parent" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
+	CONSTRAINT "drive_files_table_public_id_unique" UNIQUE("public_id")
 );
 --> statement-breakpoint
 CREATE TABLE "drive_folders_table" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"public_id" text NOT NULL,
 	"owner_id" text NOT NULL,
 	"name" text NOT NULL,
-	"parent" integer,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"parent" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
+	CONSTRAINT "drive_folders_table_public_id_unique" UNIQUE("public_id")
 );
 --> statement-breakpoint
 ALTER TABLE "auth_account" ADD CONSTRAINT "auth_account_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."auth_user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -67,6 +73,10 @@ CREATE INDEX "user_email_idx" ON "auth_user" USING btree ("email");--> statement
 CREATE INDEX "verification_token_identifier_idx" ON "auth_verification_token" USING btree ("identifier");--> statement-breakpoint
 CREATE INDEX "verification_token_expires_idx" ON "auth_verification_token" USING btree ("expires");--> statement-breakpoint
 CREATE INDEX "files_parent_index" ON "drive_files_table" USING btree ("parent");--> statement-breakpoint
+CREATE INDEX "files_public_id_index" ON "drive_files_table" USING btree ("public_id");--> statement-breakpoint
 CREATE INDEX "files_owner_id_index" ON "drive_files_table" USING btree ("owner_id");--> statement-breakpoint
+CREATE INDEX "files_deleted_at_idx" ON "drive_files_table" USING btree ("deleted_at");--> statement-breakpoint
 CREATE INDEX "folder_parent_index" ON "drive_folders_table" USING btree ("parent");--> statement-breakpoint
-CREATE INDEX "folder_owner_id_index" ON "drive_folders_table" USING btree ("owner_id");
+CREATE INDEX "folder_public_id_index" ON "drive_folders_table" USING btree ("public_id");--> statement-breakpoint
+CREATE INDEX "folder_owner_id_index" ON "drive_folders_table" USING btree ("owner_id");--> statement-breakpoint
+CREATE INDEX "folders_deleted_at_idx" ON "drive_folders_table" USING btree ("deleted_at");

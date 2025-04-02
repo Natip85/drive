@@ -16,7 +16,7 @@ export default function DriveSidebarMenuActiveButton({
 
   const isActive = pathname === href;
   return (
-    <SidebarMenuButton asChild isActive={isActive}>
+    <SidebarMenuButton asChild isActive={isActive} className="rounded-full">
       <Link href={href}>
         {icon}
         <span>{title}</span>

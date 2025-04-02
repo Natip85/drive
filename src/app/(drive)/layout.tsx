@@ -1,5 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import {
   SidebarInset,
@@ -7,6 +8,8 @@ import {
   SidebarTrigger,
 } from "~/components/ui/sidebar";
 import { DriveSidebar } from "~/navigation/drive-sidebar";
+import { auth } from "~/server/auth";
+import { api } from "~/trpc/server";
 
 export default async function DriveLayout({
   children,
@@ -15,7 +18,13 @@ export default async function DriveLayout({
 }) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
-
+  const session = await auth();
+  if (!session) {
+    return redirect("/auth/login");
+  }
+  const { rootFolderId, trashFolderId } = await api.folders.getSidebarFolders(
+    session?.user.id,
+  );
   return (
     <Suspense
       fallback={
@@ -25,7 +34,10 @@ export default async function DriveLayout({
       }
     >
       <SidebarProvider defaultOpen={defaultOpen}>
-        <DriveSidebar />
+        <DriveSidebar
+          rootFolderId={rootFolderId}
+          trashFolderId={trashFolderId}
+        />
         <SidebarTrigger />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>

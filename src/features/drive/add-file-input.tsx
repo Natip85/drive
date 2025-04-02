@@ -2,7 +2,7 @@
 import { UploadButton } from "~/lib/uploadthing";
 import { FileIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-export const AddFileInput = ({ folderId }: { folderId: number }) => {
+export const AddFileInput = ({ folderId }: { folderId: string }) => {
   const router = useRouter();
   return (
     <UploadButton

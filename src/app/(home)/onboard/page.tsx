@@ -42,5 +42,5 @@ export default async function OnboardPage() {
     );
   }
 
-  return redirect(`/drive/${rootFolder.id}`);
+  return redirect(`/drive/${rootFolder.publicId}`);
 }

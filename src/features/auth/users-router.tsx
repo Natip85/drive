@@ -54,10 +54,10 @@ export const usersRouter = createTRPCRouter({
             ownerId: input,
           })
           .returning({
-            id: folders_table.id,
+            publicId: folders_table.publicId,
           });
 
-        const rootFolderId = rootFolder[0]?.id;
+        const rootFolderId = rootFolder[0]?.publicId;
 
         await ctx.db.insert(folders_table).values([
           {

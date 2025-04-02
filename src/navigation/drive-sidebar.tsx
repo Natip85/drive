@@ -27,24 +27,30 @@ import { ResponsiveDialog } from "~/components/responsive-dialog";
 import { AddFileInput } from "~/features/drive/add-file-input";
 import { usePathname } from "next/navigation";
 import AddRenameFolderForm from "~/features/drive/add-rename-folder-form";
+type Props = {
+  rootFolderId: string | null;
+  trashFolderId: string | null;
+};
 
-const items = [
-  {
-    title: "Home",
-    url: "/drive/1",
-    icon: HomeIcon,
-  },
-  {
-    title: "Trash",
-    url: "/drive/2",
-    icon: Trash2Icon,
-  },
-];
-
-export function DriveSidebar() {
+export function DriveSidebar({ rootFolderId, trashFolderId }: Props) {
   const [addFolderOpen, setAddFolderOpen] = useState(false);
   const pathname = usePathname();
-  const folderId = Number(pathname.split("/").pop());
+  const folderId = pathname.split("/").pop();
+  if (!folderId) {
+    return <div>No folder id found</div>;
+  }
+  const items = [
+    {
+      title: "Home",
+      url: `/drive/${rootFolderId}`,
+      icon: HomeIcon,
+    },
+    {
+      title: "Trash",
+      url: "/drive/trash",
+      icon: Trash2Icon,
+    },
+  ];
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
@@ -55,12 +61,12 @@ export function DriveSidebar() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               asChild
             >
-              <Link href="/drive/1" className="items-center">
+              <Link href={`/drive/${rootFolderId}`} className="items-center">
                 <div className="flex items-center justify-center rounded-lg pl-1.5">
                   <Home />
                 </div>
                 <div className="flex h-full flex-col justify-end pb-1 text-left text-sm leading-tight">
-                  <span className="truncate text-xs">My Drive</span>
+                  <span className="truncate text-xs">Family Drive</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -72,7 +78,7 @@ export function DriveSidebar() {
           <SidebarMenuItem className="pl-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="w-full rounded-xl border bg-white p-5 pl-2 shadow-xl">
+                <SidebarMenuButton className="w-full rounded-xl border bg-white p-7 pl-2 shadow-xl hover:bg-sidebar">
                   <div>
                     <PlusIcon className="-ml-1" />
                   </div>
