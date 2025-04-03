@@ -131,41 +131,41 @@ export const foldersRouter = createTRPCRouter({
       }
       // const folderIdsToUpdate = await getAllDescendantFolders(input, ctx.db);
 
-      const updateFolderResult = await ctx.db
-        .update(folders_table)
-        .set({ deletedAt: new Date() })
-        // .where(
-        //   and(
-        //     eq(folders_table.ownerId, ctx.session.user.id),
-        //     inArray(folders_table.publicId, folderIdsToUpdate),
-        //   ),
-        // )
-        .returning();
+      // const updateFolderResult = await ctx.db
+      //   .update(folders_table)
+      //   .set({ deletedAt: new Date() })
+      //   .where(
+      //     and(
+      //       eq(folders_table.ownerId, ctx.session.user.id),
+      //       inArray(folders_table.publicId, folderIdsToUpdate),
+      //     ),
+      //   )
+      //   .returning();
 
-      if (!updateFolderResult.length) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "No folders found to mark as deleted",
-        });
-      }
+      // if (!updateFolderResult.length) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "No folders found to mark as deleted",
+      //   });
+      // }
 
-      const updateFileResult = await ctx.db
-        .update(files_table)
-        .set({ deletedAt: new Date() })
-        // .where(
-        //   and(
-        //     eq(files_table.ownerId, ctx.session.user.id),
-        //     inArray(files_table.parent, folderIdsToUpdate),
-        //   ),
-        // )
-        .returning();
+      // const updateFileResult = await ctx.db
+      //   .update(files_table)
+      //   .set({ deletedAt: new Date() })
+      //   .where(
+      //     and(
+      //       eq(files_table.ownerId, ctx.session.user.id),
+      //       inArray(files_table.parent, folderIdsToUpdate),
+      //     ),
+      //   )
+      //   .returning();
 
-      if (!updateFileResult) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "No files found to mark as deleted",
-        });
-      }
+      // if (!updateFileResult) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "No files found to mark as deleted",
+      //   });
+      // }
 
       return { success: true };
     }),
