@@ -4,6 +4,9 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { files_table, folders_table } from "~/server/db/schema";
 import { folderAddRenameSchema, folderSelectSchema } from "./folder-types";
+import { UTApi } from "uploadthing/server";
+
+const utApi = new UTApi();
 
 export const foldersRouter = createTRPCRouter({
   getFolders: protectedProcedure
@@ -223,5 +226,88 @@ export const foldersRouter = createTRPCRouter({
       }
 
       return { success: true };
+    }),
+
+  deleteFolderForever: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      // Step 1: Get all descendant folders including the main folder
+      const folderIdsToDelete: string[] = [];
+      const queue: string[] = [input];
+
+      while (queue.length > 0) {
+        const currentId = queue.shift();
+        if (!currentId) continue;
+
+        folderIdsToDelete.push(currentId);
+
+        const childFolders = await ctx.db
+          .select({ publicId: folders_table.publicId })
+          .from(folders_table)
+          .where(eq(folders_table.parent, currentId));
+
+        queue.push(...childFolders.map((folder) => folder.publicId));
+      }
+
+      if (folderIdsToDelete.length === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No folders found to delete",
+        });
+      }
+
+      // Step 2: Get all files within these folders
+      const filesToDelete = await ctx.db
+        .select({ publicId: files_table.publicId, url: files_table.url })
+        .from(files_table)
+        .where(
+          and(
+            eq(files_table.ownerId, ctx.session.user.id),
+            inArray(files_table.parent, folderIdsToDelete),
+          ),
+        );
+
+      // Extract UploadThing file IDs from URLs
+      const fileIds: string[] = filesToDelete
+        .map((file) => file.url.split("/f/")[1])
+        .filter((id): id is string => Boolean(id));
+
+      // Step 3: Delete files from UploadThing (external storage)
+      let utapiResult = { deletedCount: 0 };
+      if (fileIds.length > 0) {
+        utapiResult = await utApi.deleteFiles(fileIds);
+      }
+
+      // Step 4: Delete all files from database
+      await ctx.db.delete(files_table).where(
+        and(
+          eq(files_table.ownerId, ctx.session.user.id),
+          inArray(
+            files_table.publicId,
+            filesToDelete.map((file) => file.publicId),
+          ),
+        ),
+      );
+
+      // Step 5: Delete all folders
+      await ctx.db
+        .delete(folders_table)
+        .where(
+          and(
+            eq(folders_table.ownerId, ctx.session.user.id),
+            inArray(folders_table.publicId, folderIdsToDelete),
+          ),
+        );
+
+      return {
+        success: true,
+        utDeleted: utapiResult.deletedCount,
+        dbDeletedFiles: filesToDelete.length,
+        dbDeletedFolders: folderIdsToDelete.length,
+      };
     }),
 });

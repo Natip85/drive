@@ -174,16 +174,12 @@ export function TrashedFileRow(props: {
   return (
     <TableRow key={file.id} className="hover:bg-gray-750">
       <TableCell className="w-6/12">
-        <a
-          href={file.url}
-          className="flex items-center gap-3 hover:text-blue-400"
-          target="_blank"
-        >
+        <span className="flex items-center gap-3 hover:text-blue-400">
           <div>
             <ImageIcon />
           </div>
           <div>{file.name}</div>
-        </a>
+        </span>
       </TableCell>
       <TableCell className="w-2/12 text-gray-400">file</TableCell>
       <TableCell className="w-3/12 text-gray-400">{file.size}</TableCell>
@@ -473,47 +469,81 @@ export function TrashedFolderRow(props: {
 }) {
   const router = useRouter();
   const { folder } = props;
-  const { mutateAsync: restoreFolder } =
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const { mutateAsync: restoreFolder, isPending: isLoading } =
     api.folders.restoreFolder.useMutation();
+  const { mutateAsync: deleteFolder, isPending: isDeleteLoading } =
+    api.folders.deleteFolderForever.useMutation();
   return (
-    <TableRow key={folder.id} className="hover:bg-gray-750">
-      <TableCell className="w-6/12">
-        <span className="flex items-center">
-          <FolderIcon className="mr-3" size={20} />
-          {folder.name}
-        </span>
-      </TableCell>
-      <TableCell className="w-2/12">folder</TableCell>
-      <TableCell className="w-3/12">--</TableCell>
-      <TableCell className="w-1/12">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="button" variant="ghost">
-              <MoreHorizontal />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[160px]">
-            <DropdownMenuItem
-              onClick={async () => {
-                await restoreFolder(folder.publicId);
-                router.refresh();
-                toast("Folder restored", {
-                  description: `Folder ${folder.name} succeffully restored`,
-                });
-              }}
-            >
-              <Undo className="size-4" /> Restore
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem>
-              <Trash2 className="size-4" /> Delete forever
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
-    </TableRow>
+    <Fragment key={folder.id}>
+      <TableRow className="hover:bg-gray-750">
+        <TableCell className="w-6/12">
+          <span className="flex items-center">
+            <FolderIcon className="mr-3" size={20} />
+            {folder.name}
+          </span>
+        </TableCell>
+        <TableCell className="w-2/12">folder</TableCell>
+        <TableCell className="w-3/12">--</TableCell>
+        <TableCell className="w-1/12">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost">
+                <MoreHorizontal />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[160px]">
+              <DropdownMenuItem
+                onClick={async () => {
+                  await restoreFolder(folder.publicId);
+                  router.refresh();
+                  toast("Folder restored", {
+                    description: `Folder ${folder.name} succeffully restored`,
+                  });
+                }}
+              >
+                <Undo className="size-4" /> Restore
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
+                <Trash2 className="size-4" /> Delete forever
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      </TableRow>
+      <ResponsiveDialog
+        isOpen={deleteOpen}
+        setIsOpen={setDeleteOpen}
+        title="DELETE FOREVER"
+        description="This action cannot be undone. The folders and files deleted will also be deleted from our servers."
+      >
+        <div className="flex items-center justify-end gap-5">
+          <DialogClose>Cancel</DialogClose>
+          <Button
+            variant={"ghost"}
+            type="button"
+            onClick={async () => {
+              await deleteFolder(folder.publicId);
+              toast("Folder deleted", {
+                description: `Folder ${folder.name} and related subitems succeffully deleted`,
+              });
+              router.refresh();
+            }}
+            disabled={isDeleteLoading}
+          >
+            {isDeleteLoading ? (
+              <>
+                <Loader2 className="animate-spin" /> Deleting...
+              </>
+            ) : (
+              <>Delete forever</>
+            )}
+          </Button>
+        </div>
+      </ResponsiveDialog>
+    </Fragment>
   );
 }
 
@@ -522,8 +552,12 @@ export function TrashedFolderCard(props: {
 }) {
   const router = useRouter();
   const { folder } = props;
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
   const { mutateAsync: restoreFolder, isPending: isLoading } =
     api.folders.restoreFolder.useMutation();
+  const { mutateAsync: deleteFolder, isPending: isDeleteLoading } =
+    api.folders.deleteFolderForever.useMutation();
   return (
     <Card key={folder.id}>
       <CardContent className="flex items-center justify-between gap-1 p-2">
@@ -554,16 +588,46 @@ export function TrashedFolderCard(props: {
               }}
               disabled={isLoading}
             >
-              <Trash2 className="mr-2 size-4" />
+              <Undo className="size-4" />
               {isLoading ? "Restoring..." : "Restore"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
               <Trash2 className="size-4" /> Delete forever
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardContent>
+      <ResponsiveDialog
+        isOpen={deleteOpen}
+        setIsOpen={setDeleteOpen}
+        title="DELETE FOREVER"
+        description="This action cannot be undone. The folders and files deleted will also be deleted from our servers."
+      >
+        <div className="flex items-center justify-end gap-5">
+          <DialogClose>Cancel</DialogClose>
+          <Button
+            variant={"ghost"}
+            type="button"
+            onClick={async () => {
+              await deleteFolder(folder.publicId);
+              toast("Folder deleted", {
+                description: `Folder ${folder.name} and related subitems succeffully deleted`,
+              });
+              router.refresh();
+            }}
+            disabled={isDeleteLoading}
+          >
+            {isDeleteLoading ? (
+              <>
+                <Loader2 className="animate-spin" /> Deleting...
+              </>
+            ) : (
+              <>Delete forever</>
+            )}
+          </Button>
+        </div>
+      </ResponsiveDialog>
     </Card>
   );
 }
