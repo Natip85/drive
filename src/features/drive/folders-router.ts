@@ -129,43 +129,43 @@ export const foldersRouter = createTRPCRouter({
       if (!ctx.session?.user) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-      const folderIdsToUpdate = await getAllDescendantFolders(input, ctx.db);
+      // const folderIdsToUpdate = await getAllDescendantFolders(input, ctx.db);
 
-      const updateFolderResult = await ctx.db
-        .update(folders_table)
-        .set({ deletedAt: new Date() })
-        .where(
-          and(
-            eq(folders_table.ownerId, ctx.session.user.id),
-            inArray(folders_table.publicId, folderIdsToUpdate),
-          ),
-        )
-        .returning();
+      // const updateFolderResult = await ctx.db
+      //   .update(folders_table)
+      //   .set({ deletedAt: new Date() })
+      //   .where(
+      //     and(
+      //       eq(folders_table.ownerId, ctx.session.user.id),
+      //       inArray(folders_table.publicId, folderIdsToUpdate),
+      //     ),
+      //   )
+      //   .returning();
 
-      if (!updateFolderResult.length) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "No folders found to mark as deleted",
-        });
-      }
+      // if (!updateFolderResult.length) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "No folders found to mark as deleted",
+      //   });
+      // }
 
-      const updateFileResult = await ctx.db
-        .update(files_table)
-        .set({ deletedAt: new Date() })
-        .where(
-          and(
-            eq(files_table.ownerId, ctx.session.user.id),
-            inArray(files_table.parent, folderIdsToUpdate),
-          ),
-        )
-        .returning();
+      // const updateFileResult = await ctx.db
+      //   .update(files_table)
+      //   .set({ deletedAt: new Date() })
+      //   .where(
+      //     and(
+      //       eq(files_table.ownerId, ctx.session.user.id),
+      //       inArray(files_table.parent, folderIdsToUpdate),
+      //     ),
+      //   )
+      //   .returning();
 
-      if (!updateFileResult) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "No files found to mark as deleted",
-        });
-      }
+      // if (!updateFileResult) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "No files found to mark as deleted",
+      //   });
+      // }
 
       return { success: true };
     }),
@@ -199,26 +199,26 @@ export const foldersRouter = createTRPCRouter({
     }),
 });
 
-async function getAllDescendantFolders(
-  folderPublicId: string,
-  tx: any,
-): Promise<string[]> {
-  const queue: string[] = [folderPublicId];
-  const allFolderIds: string[] = [];
+// async function getAllDescendantFolders(
+//   folderPublicId: string,
+//   tx: any,
+// ): Promise<string[]> {
+//   const queue: string[] = [folderPublicId];
+//   const allFolderIds: string[] = [];
 
-  while (queue.length > 0) {
-    const currentId = queue.shift();
-    if (!currentId) continue;
+//   while (queue.length > 0) {
+//     const currentId = queue.shift();
+//     if (!currentId) continue;
 
-    allFolderIds.push(currentId);
+//     allFolderIds.push(currentId);
 
-    const childFolders: [{ publicId: string }] = await tx
-      .select({ publicId: folders_table.publicId })
-      .from(folders_table)
-      .where(eq(folders_table.parent, currentId));
+//     const childFolders: [{ publicId: string }] = await tx
+//       .select({ publicId: folders_table.publicId })
+//       .from(folders_table)
+//       .where(eq(folders_table.parent, currentId));
 
-    queue.push(...childFolders.map((folder) => folder.publicId));
-  }
+//     queue.push(...childFolders.map((folder) => folder.publicId));
+//   }
 
-  return allFolderIds;
-}
+//   return allFolderIds;
+// }
