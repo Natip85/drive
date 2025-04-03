@@ -16,6 +16,7 @@ import {
   TrashedFolderRow,
 } from "./f-r-rows";
 import type { files_table, folders_table } from "~/server/db/schema";
+import EmptyTrash from "../../assets/images/empty-trash.svg";
 type Props = {
   files: (typeof files_table.$inferSelect)[];
   folders: (typeof folders_table.$inferSelect)[];
@@ -34,16 +35,24 @@ export default function TrashContents({
   }, [viewMode]);
   return (
     <>
+      <div className="flex items-center justify-between pr-10">
+        <h2 className="text-2xl font-bold md:text-4xl">Trash</h2>
+
+        <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
+      </div>
       {!files.length && !folders.length ? (
-        <div>nothing here</div>
+        <div className="flex flex-col items-center justify-center">
+          <div className="size-96">
+            <EmptyTrash />
+          </div>
+          <div className="text-2xl font-bold md:text-4xl">Nothing in trash</div>
+          <p className="max-w-96 text-center">
+            Move items you dont need to trash. Items in trash will be deleted
+            forever after 30 days.
+          </p>
+        </div>
       ) : (
         <div>
-          <div className="flex items-center justify-between pr-10">
-            <h2 className="text-2xl font-bold md:text-4xl">Trash</h2>
-
-            <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-          </div>
-
           {viewMode === "list" ? (
             <Table>
               <TableHeader>
