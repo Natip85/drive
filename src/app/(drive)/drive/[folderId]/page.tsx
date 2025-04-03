@@ -21,7 +21,7 @@ export default async function DrivePage({ params }: Props) {
   const defaultViewMode =
     (cookieStore.get("viewMode")?.value as "list" | "grid") || "grid";
   return (
-    <div className="p-2 md:p-5">
+    <div className="p-2 md:p-10">
       <DriveContents
         files={files}
         folders={folders}

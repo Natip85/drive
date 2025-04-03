@@ -9,6 +9,7 @@ import { files_table } from "~/server/db/schema";
 import { eq, and, isNull, isNotNull } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
+import { fileSelectSchema } from "./file-types";
 
 const utApi = new UTApi();
 
@@ -27,6 +28,7 @@ export const filesRouter = createTRPCRouter({
         )
         .orderBy(files_table.id);
     }),
+
   getTrashFiles: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -37,6 +39,7 @@ export const filesRouter = createTRPCRouter({
       .where(isNotNull(files_table.deletedAt))
       .orderBy(files_table.deletedAt);
   }),
+
   createNewFile: publicProcedure
     .input(
       z.object({
@@ -55,6 +58,7 @@ export const filesRouter = createTRPCRouter({
         ownerId: input.userId,
       });
     }),
+
   deleteFile: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -103,6 +107,7 @@ export const filesRouter = createTRPCRouter({
         dbDeleted: dbDeleteResult.length,
       };
     }),
+
   moveFileToTrash: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -130,6 +135,7 @@ export const filesRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
   restoreFile: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -157,5 +163,27 @@ export const filesRouter = createTRPCRouter({
       }
 
       return { success: true };
+    }),
+
+  renameFile: protectedProcedure
+    .input(fileSelectSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      const existingFile = await ctx.db
+        .select()
+        .from(files_table)
+        .where(eq(files_table.publicId, input.publicId))
+        .limit(1);
+
+      if (!existingFile.length) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "File not found" });
+      }
+
+      return await ctx.db
+        .update(files_table)
+        .set({ name: input.name })
+        .where(eq(files_table.publicId, input.publicId));
     }),
 });

@@ -11,7 +11,7 @@ export default async function TrashPage() {
   const defaultViewMode =
     (cookieStore.get("viewMode")?.value as "list" | "grid") || "grid";
   return (
-    <div>
+    <div className="p-2 md:p-10">
       <TrashContents
         folders={folders}
         files={files}

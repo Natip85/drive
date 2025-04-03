@@ -1,5 +1,5 @@
 import type { User } from "next-auth";
-import type { UserSelect } from "~/features/drive/file-types";
+import type { UserSelect } from "~/features/auth/user-types";
 import type { UserRole } from "~/server/db/schema/constants";
 
 export type Permissions = {
