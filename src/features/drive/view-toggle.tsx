@@ -14,7 +14,7 @@ export function ViewToggle({ viewMode, setViewMode }: ViewToggleProps) {
       <button
         onClick={() => setViewMode("grid")}
         className={cn(
-          "flex size-12 items-center justify-center gap-1 rounded-l-full border border-black px-8 transition-all",
+          "flex h-8 w-12 items-center justify-center gap-1 rounded-l-full border border-black px-8 transition-all",
           viewMode === "grid"
             ? "bg-sidebar text-primary-foreground"
             : "bg-transparent text-muted-foreground hover:bg-muted",
@@ -33,7 +33,7 @@ export function ViewToggle({ viewMode, setViewMode }: ViewToggleProps) {
       <button
         onClick={() => setViewMode("list")}
         className={cn(
-          "flex size-12 items-center justify-center gap-1 rounded-r-full border border-black px-8 transition-all",
+          "flex h-8 w-12 items-center justify-center gap-1 rounded-r-full border border-black px-8 transition-all",
           viewMode === "list"
             ? "bg-sidebar text-primary-foreground"
             : "bg-transparent text-muted-foreground hover:bg-muted",

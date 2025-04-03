@@ -20,6 +20,7 @@ export const foldersRouter = createTRPCRouter({
         )
         .orderBy(folders_table.id);
     }),
+
   getTrashFolders: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -30,6 +31,7 @@ export const foldersRouter = createTRPCRouter({
       .where(isNotNull(folders_table.deletedAt))
       .orderBy(folders_table.deletedAt);
   }),
+
   getSidebarFolders: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -57,6 +59,7 @@ export const foldersRouter = createTRPCRouter({
         rootFolderId: folderMap.Root ?? null,
       };
     }),
+
   getAllParentsForFolder: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -79,6 +82,7 @@ export const foldersRouter = createTRPCRouter({
       }
       return parents;
     }),
+
   getFolderById: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -91,6 +95,7 @@ export const foldersRouter = createTRPCRouter({
         .where(eq(folders_table.publicId, input));
       return folder[0];
     }),
+
   createNewFolder: protectedProcedure
     .input(folderAddRenameSchema)
     .mutation(async ({ ctx, input }) => {
@@ -102,6 +107,7 @@ export const foldersRouter = createTRPCRouter({
         ...input,
       });
     }),
+
   renameFolder: protectedProcedure
     .input(folderSelectSchema)
     .mutation(async ({ ctx, input }) => {
@@ -123,54 +129,73 @@ export const foldersRouter = createTRPCRouter({
         .set({ name: input.name })
         .where(eq(folders_table.publicId, input.publicId));
     }),
+
   moveFolderToTrash: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       if (!ctx.session?.user) {
-        console.log("rrrrrr");
-
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-      // const folderIdsToUpdate = await getAllDescendantFolders(input, ctx.db);
 
-      // const updateFolderResult = await ctx.db
-      //   .update(folders_table)
-      //   .set({ deletedAt: new Date() })
-      //   .where(
-      //     and(
-      //       eq(folders_table.ownerId, ctx.session.user.id),
-      //       inArray(folders_table.publicId, folderIdsToUpdate),
-      //     ),
-      //   )
-      //   .returning();
+      // Inline getAllDescendantFolders function
+      const folderIdsToUpdate: string[] = [];
+      const queue: string[] = [input];
 
-      // if (!updateFolderResult.length) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "No folders found to mark as deleted",
-      //   });
-      // }
+      while (queue.length > 0) {
+        const currentId = queue.shift();
+        if (!currentId) continue;
 
-      // const updateFileResult = await ctx.db
-      //   .update(files_table)
-      //   .set({ deletedAt: new Date() })
-      //   .where(
-      //     and(
-      //       eq(files_table.ownerId, ctx.session.user.id),
-      //       inArray(files_table.parent, folderIdsToUpdate),
-      //     ),
-      //   )
-      //   .returning();
+        folderIdsToUpdate.push(currentId);
 
-      // if (!updateFileResult) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "No files found to mark as deleted",
-      //   });
-      // }
+        const childFolders = await ctx.db
+          .select({ publicId: folders_table.publicId })
+          .from(folders_table)
+          .where(eq(folders_table.parent, currentId));
+
+        queue.push(...childFolders.map((folder) => folder.publicId));
+      }
+
+      // Update folders
+      const updateFolderResult = await ctx.db
+        .update(folders_table)
+        .set({ deletedAt: new Date() })
+        .where(
+          and(
+            eq(folders_table.ownerId, ctx.session.user.id),
+            inArray(folders_table.publicId, folderIdsToUpdate),
+          ),
+        )
+        .returning();
+
+      if (!updateFolderResult.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No folders found to mark as deleted",
+        });
+      }
+
+      // Update files
+      const updateFileResult = await ctx.db
+        .update(files_table)
+        .set({ deletedAt: new Date() })
+        .where(
+          and(
+            eq(files_table.ownerId, ctx.session.user.id),
+            inArray(files_table.parent, folderIdsToUpdate),
+          ),
+        )
+        .returning();
+
+      if (!updateFileResult) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No files found to mark as deleted",
+        });
+      }
 
       return { success: true };
     }),
+
   restoreFolder: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -200,27 +225,3 @@ export const foldersRouter = createTRPCRouter({
       return { success: true };
     }),
 });
-
-// async function getAllDescendantFolders(
-//   folderPublicId: string,
-//   tx: any,
-// ): Promise<string[]> {
-//   const queue: string[] = [folderPublicId];
-//   const allFolderIds: string[] = [];
-
-//   while (queue.length > 0) {
-//     const currentId = queue.shift();
-//     if (!currentId) continue;
-
-//     allFolderIds.push(currentId);
-
-//     const childFolders: [{ publicId: string }] = await tx
-//       .select({ publicId: folders_table.publicId })
-//       .from(folders_table)
-//       .where(eq(folders_table.parent, currentId));
-
-//     queue.push(...childFolders.map((folder) => folder.publicId));
-//   }
-
-//   return allFolderIds;
-// }

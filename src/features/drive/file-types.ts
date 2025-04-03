@@ -1,9 +1,9 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { type z } from "zod";
-import { users } from "~/server/db/schema";
+import { files_table } from "~/server/db/schema";
 
-export const userInsertSchema = createInsertSchema(users);
-export const userSelectSchema = createSelectSchema(users);
+export const fileInsertSchema = createInsertSchema(files_table);
+export const fileSelectSchema = createSelectSchema(files_table);
 
-export type UserInsert = z.infer<typeof userInsertSchema>;
-export type UserSelect = z.infer<typeof userSelectSchema>;
+export type FileInsert = z.infer<typeof fileInsertSchema>;
+export type FileSelect = z.infer<typeof fileSelectSchema>;
