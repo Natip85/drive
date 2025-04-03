@@ -127,6 +127,8 @@ export const foldersRouter = createTRPCRouter({
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       if (!ctx.session?.user) {
+        console.log("rrrrrr");
+
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
       // const folderIdsToUpdate = await getAllDescendantFolders(input, ctx.db);
