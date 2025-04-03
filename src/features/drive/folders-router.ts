@@ -199,7 +199,6 @@ export const foldersRouter = createTRPCRouter({
     }),
 });
 
-/* eslint-disable */
 async function getAllDescendantFolders(
   folderPublicId: string,
   tx: any,
