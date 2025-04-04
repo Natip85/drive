@@ -6,7 +6,7 @@ import {
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { files_table } from "~/server/db/schema";
-import { eq, and, isNull, isNotNull } from "drizzle-orm";
+import { eq, and, ilike, isNull, isNotNull } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
 import { fileSelectSchema } from "./file-types";
@@ -14,6 +14,22 @@ import { fileSelectSchema } from "./file-types";
 const utApi = new UTApi();
 
 export const filesRouter = createTRPCRouter({
+  getAllFiles: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.session?.user) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return ctx.db
+      .select()
+      .from(files_table)
+      .where(
+        and(
+          eq(files_table.ownerId, ctx.session.user.id),
+          isNull(files_table.deletedAt),
+        ),
+      )
+      .orderBy(files_table.id);
+  }),
+
   getFiles: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -24,9 +40,38 @@ export const filesRouter = createTRPCRouter({
         .select()
         .from(files_table)
         .where(
-          and(eq(files_table.parent, input), isNull(files_table.deletedAt)),
+          and(
+            eq(files_table.parent, input),
+            eq(files_table.ownerId, ctx.session.user.id),
+            isNull(files_table.deletedAt),
+          ),
         )
         .orderBy(files_table.id);
+    }),
+  getSearchTermFiles: protectedProcedure
+    .input(
+      z.object({
+        searchTerm: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.session?.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const results = await ctx.db
+        .select()
+        .from(files_table)
+        .where(
+          and(
+            eq(files_table.ownerId, ctx.session.user.id),
+            isNull(files_table.deletedAt),
+            ilike(files_table.name, `%${input.searchTerm}%`),
+          ),
+        )
+        .orderBy(files_table.id);
+
+      return results;
     }),
 
   getTrashFiles: protectedProcedure.query(async ({ ctx }) => {

@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import type { Photo } from "~/app/(photos)/photos/page";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
+import type { FileSelect } from "../drive/file-types";
 
 export function PhotoGalleryDialog({
   isOpen,
@@ -20,7 +20,7 @@ export function PhotoGalleryDialog({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  photos: Photo[];
+  photos: FileSelect[];
   initialPhotoId: string | null;
 }) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
@@ -28,7 +28,9 @@ export function PhotoGalleryDialog({
   // Find the index of the initial photo when dialog opens
   useState(() => {
     if (initialPhotoId) {
-      const index = photos.findIndex((photo) => photo.id === initialPhotoId);
+      const index = photos.findIndex(
+        (photo) => photo.publicId === initialPhotoId,
+      );
       if (index !== -1) {
         setCurrentPhotoIndex(index);
       }
@@ -61,11 +63,11 @@ export function PhotoGalleryDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="flex h-[90vh] max-w-5xl flex-col p-0"
+        className="flex h-[90vh] w-[100vw] flex-col p-0"
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
-        <DialogTitle className="sr-only">{currentPhoto.alt}</DialogTitle>
+        <DialogTitle className="sr-only">{currentPhoto.name}</DialogTitle>
 
         {/* Close button */}
         <Button
@@ -80,13 +82,14 @@ export function PhotoGalleryDialog({
 
         {/* Main image container */}
         <div className="relative flex flex-1 items-center justify-center bg-black">
-          <Image
-            src={currentPhoto.src || "/placeholder.svg"}
-            alt={currentPhoto.alt}
-            width={currentPhoto.width}
-            height={currentPhoto.height}
-            className="max-h-full max-w-full object-contain"
-          />
+          <div className="h-96">
+            <Image
+              src={currentPhoto.url || "/placeholder.svg"}
+              alt={currentPhoto.name}
+              fill
+              className="max-h-full max-w-full object-cover"
+            />
+          </div>
 
           {/* Navigation buttons */}
           <Button
@@ -112,7 +115,7 @@ export function PhotoGalleryDialog({
           {/* Image info */}
           <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-gradient-to-t from-black/50 to-transparent p-4 text-white">
             <div className="flex items-center gap-2">
-              <span>{currentPhoto.alt}</span>
+              <span>{currentPhoto.name}</span>
               <span className="text-sm text-white/70">
                 {currentPhotoIndex + 1} of {photos.length}
               </span>
@@ -137,13 +140,13 @@ export function PhotoGalleryDialog({
               <div
                 key={photo.id}
                 className={`aspect-square h-full cursor-pointer overflow-hidden rounded ${
-                  index === currentPhotoIndex ? "ring-2 ring-primary" : ""
+                  index === currentPhotoIndex ? "ring-2 ring-sky-500" : ""
                 }`}
                 onClick={() => setCurrentPhotoIndex(index)}
               >
                 <Image
-                  src={photo.src || "/placeholder.svg"}
-                  alt={photo.alt}
+                  src={photo.url || "/placeholder.svg"}
+                  alt={photo.name}
                   width={80}
                   height={80}
                   className="h-full w-full object-cover"

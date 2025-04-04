@@ -5,11 +5,11 @@ import { LoginForm } from "~/features/auth/login-form";
 
 export default function LoginPage() {
   return (
-    <div className="relative flex min-h-screen flex-1 items-center justify-center p-2">
+    <div className="relative flex min-h-screen flex-1 items-center justify-center bg-sidebar p-2">
       <Button
         variant="ghost"
         asChild
-        className="hover:text-primary absolute top-4 left-4 hover:bg-transparent"
+        className="absolute left-4 top-4 hover:bg-transparent hover:text-blue-500"
       >
         <Link href="/">
           <ArrowLeft /> Back
