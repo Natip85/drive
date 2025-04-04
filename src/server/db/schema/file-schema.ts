@@ -1,6 +1,15 @@
-import { index, integer, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createTable } from "../utils";
 import * as Utils from "../utils";
+import { relations } from "drizzle-orm";
+import { users } from ".";
 
 export const files_table = createTable(
   "files_table",
@@ -27,3 +36,32 @@ export const files_table = createTable(
     ];
   },
 );
+
+export const fileRelations = relations(files_table, ({ one, many }) => ({
+  favorites: many(fileFavorites),
+}));
+
+export const fileFavorites = Utils.createTable(
+  "file_favorites",
+  {
+    userId: Utils.userId()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    filePublicId: text("file_favorites_public_id")
+      .references(() => files_table.publicId, { onDelete: "cascade" })
+      .notNull(),
+    createdAt: Utils.createUpdateTimestamps.createdAt,
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.filePublicId] }),
+    userIdIdx: index("file_favorites_user_id_idx").on(t.userId),
+  }),
+);
+
+export const fileFavoritesRelations = relations(fileFavorites, ({ one }) => ({
+  user: one(users, { fields: [fileFavorites.userId], references: [users.id] }),
+  file: one(files_table, {
+    fields: [fileFavorites.filePublicId],
+    references: [files_table.publicId],
+  }),
+}));

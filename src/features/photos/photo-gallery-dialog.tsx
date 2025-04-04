@@ -1,16 +1,10 @@
 "use client";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Info,
-  MoreHorizontal,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
-import type { FileSelect } from "../drive/file-types";
+import { type File } from "../drive/file-types";
 
 export function PhotoGalleryDialog({
   isOpen,
@@ -20,12 +14,11 @@ export function PhotoGalleryDialog({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  photos: FileSelect[];
+  photos: File;
   initialPhotoId: string | null;
 }) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
 
-  // Find the index of the initial photo when dialog opens
   useState(() => {
     if (initialPhotoId) {
       const index = photos.findIndex(
@@ -47,7 +40,6 @@ export function PhotoGalleryDialog({
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
   };
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowRight") {
       goToNextPhoto();
@@ -63,31 +55,21 @@ export function PhotoGalleryDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="flex h-[90vh] w-[100vw] flex-col p-0"
+        className="h-[95vh] w-[80vw] max-w-none p-0 sm:max-w-none md:max-w-none lg:max-w-none"
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
         <DialogTitle className="sr-only">{currentPhoto.name}</DialogTitle>
 
-        {/* Close button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-4 top-4 z-50 rounded-full bg-background/80"
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </Button>
-
         {/* Main image container */}
-        <div className="relative flex flex-1 items-center justify-center bg-black">
-          <div className="h-96">
+        <div className="relative flex w-full flex-1 items-center justify-center bg-black">
+          <div className="relative h-[70vh] w-full">
             <Image
               src={currentPhoto.url || "/placeholder.svg"}
               alt={currentPhoto.name}
               fill
-              className="max-h-full max-w-full object-cover"
+              className="object-contain"
+              sizes="90vw"
             />
           </div>
 

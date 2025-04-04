@@ -5,7 +5,7 @@ import {
 } from "~/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { files_table } from "~/server/db/schema";
+import { fileFavorites, files_table } from "~/server/db/schema";
 import { eq, and, ilike, isNull, isNotNull } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
@@ -15,19 +15,44 @@ const utApi = new UTApi();
 
 export const filesRouter = createTRPCRouter({
   getAllFiles: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.session?.user) {
+    const userId = ctx.session?.user.id;
+
+    if (!userId) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
-    return ctx.db
-      .select()
-      .from(files_table)
-      .where(
-        and(
-          eq(files_table.ownerId, ctx.session.user.id),
-          isNull(files_table.deletedAt),
-        ),
-      )
-      .orderBy(files_table.id);
+
+    const files = await ctx.db.query.files_table.findMany({
+      where: and(
+        eq(files_table.ownerId, userId),
+        isNull(files_table.deletedAt),
+      ),
+      with: {
+        favorites: true,
+      },
+    });
+
+    return files;
+  }),
+  getAllFavoriteFiles: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session?.user.id;
+
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const files = await ctx.db.query.files_table.findMany({
+      where: and(
+        eq(files_table.ownerId, userId),
+        isNull(files_table.deletedAt),
+      ),
+      with: {
+        favorites: true,
+      },
+    });
+
+    return files.filter((file) =>
+      file.favorites.some((fav) => fav.userId === userId),
+    );
   }),
 
   getFiles: protectedProcedure
@@ -48,6 +73,7 @@ export const filesRouter = createTRPCRouter({
         )
         .orderBy(files_table.id);
     }),
+
   getSearchTermFiles: protectedProcedure
     .input(
       z.object({
@@ -55,21 +81,21 @@ export const filesRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.session?.user) {
+      const userId = ctx.session?.user.id;
+
+      if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      const results = await ctx.db
-        .select()
-        .from(files_table)
-        .where(
-          and(
-            eq(files_table.ownerId, ctx.session.user.id),
-            isNull(files_table.deletedAt),
-            ilike(files_table.name, `%${input.searchTerm}%`),
-          ),
-        )
-        .orderBy(files_table.id);
+      const results = await ctx.db.query.files_table.findMany({
+        where: and(
+          eq(files_table.ownerId, userId),
+          isNull(files_table.deletedAt),
+          ilike(files_table.name, `%${input.searchTerm}%`),
+        ),
+        orderBy: (files, { asc }) => [asc(files.id)],
+        with: { favorites: true },
+      });
 
       return results;
     }),
@@ -230,5 +256,45 @@ export const filesRouter = createTRPCRouter({
         .update(files_table)
         .set({ name: input.name })
         .where(eq(files_table.publicId, input.publicId));
+    }),
+  toggleFavorite: protectedProcedure
+    .input(
+      z.object({
+        filePublicId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user.id;
+      const { filePublicId } = input;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const existingFavorite = await ctx.db.query.fileFavorites.findFirst({
+        where: and(
+          eq(fileFavorites.userId, userId),
+          eq(fileFavorites.filePublicId, filePublicId),
+        ),
+      });
+
+      if (existingFavorite) {
+        await ctx.db
+          .delete(fileFavorites)
+          .where(
+            and(
+              eq(fileFavorites.userId, userId),
+              eq(fileFavorites.filePublicId, filePublicId),
+            ),
+          );
+        return { favorited: false };
+      } else {
+        await ctx.db.insert(fileFavorites).values({
+          userId,
+          filePublicId,
+          createdAt: new Date(),
+        });
+        return { favorited: true };
+      }
     }),
 });

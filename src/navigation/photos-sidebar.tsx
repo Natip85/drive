@@ -1,5 +1,5 @@
 "use client";
-import { Home, Images, Trash2Icon } from "lucide-react";
+import { Images, Star, Trash2Icon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +14,8 @@ import {
 import Link from "next/link";
 import DriveSidebarMenuActiveButton from "./drive-sidebar-menu-active-button";
 import DriveSidebarUserMenu from "./drive-sidebar-user-menu";
-import { usePathname } from "next/navigation";
 
 export function PhotosSidebar() {
-  const pathname = usePathname();
   const items = [
     {
       title: "Photos",
@@ -25,8 +23,13 @@ export function PhotosSidebar() {
       icon: Images,
     },
     {
+      title: "Favorites",
+      url: "/photos/favorites",
+      icon: Star,
+    },
+    {
       title: "Trash",
-      url: "/dsdsds",
+      url: "/photos/trash",
       icon: Trash2Icon,
     },
   ];
@@ -42,7 +45,7 @@ export function PhotosSidebar() {
             >
               <Link href={`/photos`} className="items-center">
                 <div className="flex items-center justify-center rounded-lg pl-1.5">
-                  <Home />
+                  <Images />
                 </div>
                 <div className="flex h-full flex-col justify-end pb-1 text-left text-sm leading-tight">
                   <span className="truncate text-xs">Family Photos</span>

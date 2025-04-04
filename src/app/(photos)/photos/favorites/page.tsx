@@ -2,20 +2,13 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { buttonVariants } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import { type SearchParams } from "nuqs/server";
-import { loadPageSearchParams } from "~/hooks/use-search-params";
-import { api } from "~/trpc/server";
 import SearchInput from "~/features/photos/search-input";
-import SearchResultsPage from "~/features/photos/search-results";
-import SearchSvg from "../../../../assets/images/search.svg";
-type PageProps = {
-  searchParams: Promise<SearchParams>;
-};
+import FavoriteSvg from "../../../../assets/images/favorite.svg";
+import Favorites from "~/features/photos/favorites";
+import { api } from "~/trpc/server";
 
-export default async function SearchPage({ searchParams }: PageProps) {
-  const { searchTerm } = await loadPageSearchParams(searchParams);
-
-  const results = await api.files.getSearchTermFiles({ searchTerm });
+export default async function FavoritesPage() {
+  const [favorites] = await Promise.all([api.files.getAllFavoriteFiles()]);
 
   return (
     <div className="min-h-screen p-2 md:p-5">
@@ -34,18 +27,22 @@ export default async function SearchPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      {results.length ? (
+      {favorites.length > 0 ? (
         <div>
-          <SearchResultsPage results={results} />
+          <Favorites favorites={favorites} />
         </div>
       ) : (
         <div className="flex h-full flex-1 flex-col items-center pt-20">
           <div className="flex flex-col items-center justify-center">
             <div className="size-96">
-              <SearchSvg />
+              <FavoriteSvg />
             </div>
-            <div className="text-2xl font-bold md:text-4xl">No results</div>
-            <p className="max-w-96 text-center">Try another search term.</p>
+            <div className="text-2xl font-bold md:text-4xl">
+              No favorites yet
+            </div>
+            <p className="max-w-96 text-center">
+              Start marking your favorite photos to view them here.
+            </p>
           </div>
         </div>
       )}

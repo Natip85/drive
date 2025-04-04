@@ -4,6 +4,7 @@ import { type AdapterAccount } from "next-auth/adapters";
 
 import * as Utils from "../utils";
 import { UserRoles, type UserRole } from "./constants";
+import { fileFavorites } from ".";
 
 export const userRoleEnum = pgEnum("user_role", UserRoles);
 const defaultUserRole: UserRole[] = ["user"];
@@ -36,6 +37,7 @@ export const users = Utils.createAuthTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  favorites: many(fileFavorites),
 }));
 
 export const accounts = Utils.createAuthTable(
