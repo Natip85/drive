@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
+import NuqsProvider from "~/providers/nuqs-provider";
 // import { PostHogProvider } from "~/providers/posthog";
 // import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 // import { extractRouterConfig } from "uploadthing/server";
@@ -34,7 +35,7 @@ export default function RootLayout({
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               {/* <PostHogProvider> */}
               <Toaster />
-              {children}
+              <NuqsProvider>{children}</NuqsProvider>
               {/* </PostHogProvider> */}
             </ThemeProvider>
           </SessionProvider>

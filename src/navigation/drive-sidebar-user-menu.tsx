@@ -13,7 +13,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
-import { ChevronsUpDown, LogOutIcon, User2, UserCog2 } from "lucide-react";
+import {
+  ChevronsUpDown,
+  ImagesIcon,
+  LogOutIcon,
+  Triangle,
+  User2,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
 // import {ThemeToggle} from '../theme-toggle'
 import Link from "next/link";
@@ -53,13 +59,19 @@ export default function DriveSidebarUserMenu() {
           >
             <DropdownMenuGroup>
               {/* <ThemeToggle /> */}
-              <DropdownMenuItem
-                asChild
-                className="flex items-center gap-2 font-button text-xl"
-              >
-                <Link href={"/profile/details"}>
-                  <UserCog2 className="size-4" />
-                  My profile
+              <DropdownMenuItem asChild className="flex items-center gap-2">
+                <Link href={"/photos"}>
+                  <ImagesIcon className="size-4" />
+                  Photos
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuGroup>
+              {/* <ThemeToggle /> */}
+              <DropdownMenuItem asChild className="flex items-center gap-2">
+                <Link href={"/"}>
+                  <Triangle className="size-4" />
+                  Drive
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>

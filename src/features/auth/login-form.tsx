@@ -48,12 +48,14 @@ export function LoginForm({
   };
 
   return (
-    <Card className="border-none">
+    <Card className="w-[380px] bg-white">
       <CardHeader>
-        <CardTitle>Login to your family account</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-center text-2xl">
+          Login to your family account
+        </CardTitle>
+        {/* <CardDescription>
           We&apos;ll keep you updated on any submissions that you make
-        </CardDescription>
+        </CardDescription> */}
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -64,14 +66,19 @@ export function LoginForm({
               render={({ field, fieldState }) => (
                 <FormItem>
                   <FormControl>
-                    <Input id="email" {...field} placeholder="Email" />
+                    <Input
+                      id="email"
+                      {...field}
+                      placeholder="Email"
+                      className="bg-white"
+                    />
                   </FormControl>
                   <FormMessage>{fieldState.error?.message}</FormMessage>
                 </FormItem>
               )}
             />
             <div>
-              <Button type="submit" className="w-full">
+              <Button variant={"outline"} type="submit" className="w-full">
                 Login
               </Button>
             </div>
@@ -79,7 +86,7 @@ export function LoginForm({
         </Form>
         <div className="relative mt-6 flex items-center">
           <div className="flex-grow border" />
-          <span className="px-2">or</span>
+          <span className="px-2 text-sm">Continue with</span>
           <div className="flex-grow border" />
         </div>
       </CardContent>

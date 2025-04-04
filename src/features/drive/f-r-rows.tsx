@@ -277,7 +277,7 @@ export function TrashedFileCard(props: {
                   });
                 }}
               >
-                <Trash2 className="mr-2 size-4" /> Restore
+                <Undo className="mr-2 size-4" /> Restore
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
