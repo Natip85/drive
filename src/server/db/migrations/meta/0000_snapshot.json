@@ -1,5 +1,5 @@
 {
-  "id": "829a5bbe-a2f4-48be-8e9b-b78eefa527ef",
+  "id": "e1d1ba96-50ae-4d33-a248-cdea7c88b4d6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -344,6 +344,89 @@
           "columns": [
             "identifier",
             "token"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.drive_file_favorites": {
+      "name": "drive_file_favorites",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_favorites_public_id": {
+          "name": "file_favorites_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "file_favorites_user_id_idx": {
+          "name": "file_favorites_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "drive_file_favorites_user_id_auth_user_id_fk": {
+          "name": "drive_file_favorites_user_id_auth_user_id_fk",
+          "tableFrom": "drive_file_favorites",
+          "tableTo": "auth_user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "drive_file_favorites_file_favorites_public_id_drive_files_table_public_id_fk": {
+          "name": "drive_file_favorites_file_favorites_public_id_drive_files_table_public_id_fk",
+          "tableFrom": "drive_file_favorites",
+          "tableTo": "drive_files_table",
+          "columnsFrom": [
+            "file_favorites_public_id"
+          ],
+          "columnsTo": [
+            "public_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "drive_file_favorites_user_id_file_favorites_public_id_pk": {
+          "name": "drive_file_favorites_user_id_file_favorites_public_id_pk",
+          "columns": [
+            "user_id",
+            "file_favorites_public_id"
           ]
         }
       },
